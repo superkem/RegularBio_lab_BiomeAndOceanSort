@@ -1,0 +1,1071 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Biome & Ocean Sort Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F4EC;
+    --paper-raised:#FFFFFF;
+    --ink:#2A2A22;
+    --ink-soft:#5D5A4B;
+    --ink-faint:#8B8873;
+    --line:#DFD8C4;
+    --line-strong:#C9BEA0;
+    --forest:#2E6B4E;
+    --forest-deep:#1F4E39;
+    --forest-tint:#E3EEE3;
+    --amber:#C1782E;
+    --amber-tint:#F5E7D3;
+    --ocean:#1B6E85;
+    --ocean-deep:#134F60;
+    --ocean-tint:#DEEEF1;
+    --good:#2E7D4F;
+    --good-tint:#E3F1E7;
+    --bad:#B4402F;
+    --bad-tint:#FBE7E2;
+    --temp-line:#C1782E;
+    --precip-bar:#5B93A8;
+    --shadow: 0 1px 2px rgba(40,35,20,0.06), 0 6px 16px rgba(40,35,20,0.07);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#1B1B16;
+      --paper-raised:#242420;
+      --ink:#EDEAE0;
+      --ink-soft:#B9B4A2;
+      --ink-faint:#8B8873;
+      --line:#38362C;
+      --line-strong:#4B4738;
+      --forest:#5FAE81;
+      --forest-deep:#8FCBA8;
+      --forest-tint:#22332A;
+      --amber:#E0A059;
+      --amber-tint:#332619;
+      --ocean:#5FBBD4;
+      --ocean-deep:#8FD4E6;
+      --ocean-tint:#17313A;
+      --good:#5FAE81;
+      --good-tint:#1E3327;
+      --bad:#E48374;
+      --bad-tint:#3A2320;
+      --temp-line:#E0A059;
+      --precip-bar:#5FBBD4;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1B1B16;
+    --paper-raised:#242420;
+    --ink:#EDEAE0;
+    --ink-soft:#B9B4A2;
+    --ink-faint:#8B8873;
+    --line:#38362C;
+    --line-strong:#4B4738;
+    --forest:#5FAE81;
+    --forest-deep:#8FCBA8;
+    --forest-tint:#22332A;
+    --amber:#E0A059;
+    --amber-tint:#332619;
+    --ocean:#5FBBD4;
+    --ocean-deep:#8FD4E6;
+    --ocean-tint:#17313A;
+    --good:#5FAE81;
+    --good-tint:#1E3327;
+    --bad:#E48374;
+    --bad-tint:#3A2320;
+    --temp-line:#E0A059;
+    --precip-bar:#5FBBD4;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+    padding-inline:16px;
+    line-height:1.5;
+  }
+  .wrap{max-width:980px;margin:0 auto;}
+  h1,h2,h3{font-family:"Fraunces", Georgia, serif; font-weight:600; text-wrap:balance; margin:0;}
+  .mono{font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums;}
+
+  /* ---- Masthead ---- */
+  header.masthead{
+    padding-block:28px 18px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--ink-faint); font-weight:600; margin-bottom:8px;
+  }
+  header.masthead h1{font-size:clamp(24px,4vw,34px); color:var(--ink);}
+  header.masthead p{color:var(--ink-soft); max-width:62ch; margin-top:8px; font-size:15.5px;}
+
+  /* ---- Tabs ---- */
+  nav.tabs{
+    position:sticky; top:env(safe-area-inset-top,0px);
+    background:var(--paper);
+    display:flex; gap:6px; padding-block:12px;
+    border-bottom:1px solid var(--line);
+    overflow-x:auto; z-index:5;
+  }
+  nav.tabs button{
+    flex:0 0 auto;
+    font-family:inherit; font-size:14px; font-weight:600;
+    padding:9px 16px; border-radius:999px; border:1px solid var(--line-strong);
+    background:var(--paper-raised); color:var(--ink-soft); cursor:pointer;
+    display:flex; align-items:center; gap:8px; white-space:nowrap;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  nav.tabs button .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);}
+  nav.tabs button[data-accent="forest"].active{background:var(--forest); border-color:var(--forest); color:#fff;}
+  nav.tabs button[data-accent="forest"].active .dot{background:#fff;}
+  nav.tabs button[data-accent="amber"].active{background:var(--amber); border-color:var(--amber); color:#fff;}
+  nav.tabs button[data-accent="amber"].active .dot{background:#fff;}
+  nav.tabs button[data-accent="ocean"].active{background:var(--ocean); border-color:var(--ocean); color:#fff;}
+  nav.tabs button[data-accent="ocean"].active .dot{background:#fff;}
+  nav.tabs button:not(.active):hover{border-color:var(--ink-faint);}
+
+  .panel{padding-block:26px 40px; display:none;}
+  .panel.active{display:block;}
+
+  .brief{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:14px;
+    padding:16px 18px; display:flex; gap:14px; align-items:flex-start; box-shadow:var(--shadow);
+    margin-bottom:22px;
+  }
+  .brief .num{
+    font-family:"Fraunces",serif; font-weight:700; font-size:20px; flex:0 0 auto;
+    width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    color:#fff;
+  }
+  [data-accent="forest"] .brief .num{background:var(--forest);}
+  [data-accent="amber"] .brief .num{background:var(--amber);}
+  [data-accent="ocean"] .brief .num{background:var(--ocean);}
+  .brief h3{font-size:17px; margin-bottom:4px;}
+  .brief p{margin:0; color:var(--ink-soft); font-size:14.5px;}
+  .brief .meta{margin-top:8px; display:flex; gap:14px; flex-wrap:wrap;}
+  .meta-chip{
+    font-size:12.5px; font-weight:600; color:var(--ink-soft);
+    display:flex; align-items:center; gap:6px;
+  }
+  .meta-chip svg{width:14px;height:14px;flex:0 0 auto;}
+
+  .scoreboard{
+    display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;
+  }
+  .scoreboard .track{
+    flex:1 1 160px; height:8px; border-radius:999px; background:var(--line); overflow:hidden; min-width:120px;
+  }
+  .scoreboard .fill{height:100%; width:0%; border-radius:999px; transition:width .3s ease;}
+  [data-accent="forest"] .scoreboard .fill{background:var(--forest);}
+  [data-accent="amber"] .scoreboard .fill{background:var(--amber);}
+  [data-accent="ocean"] .scoreboard .fill{background:var(--ocean);}
+  .scoreboard .count{font-size:13.5px; font-weight:600; color:var(--ink-soft); white-space:nowrap;}
+  .btn{
+    font-family:inherit; font-size:13.5px; font-weight:600; cursor:pointer;
+    border-radius:999px; padding:8px 14px; border:1px solid var(--line-strong);
+    background:var(--paper-raised); color:var(--ink);
+  }
+  .btn:hover{border-color:var(--ink-faint);}
+  .btn.ghost{background:transparent;}
+  .btn.primary{color:#fff; border-color:transparent; background:var(--forest);}
+  [data-accent="forest"] .btn.primary{background:var(--forest);}
+  [data-accent="amber"] .btn.primary{background:var(--amber);}
+  [data-accent="ocean"] .btn.primary{background:var(--ocean);}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+
+  /* ---- Completion progress strip ---- */
+  .progress-strip{
+    display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding-block:14px 4px;
+  }
+  .progress-item{
+    display:flex; align-items:center; gap:6px; background:var(--paper-raised);
+    border:1px solid var(--line-strong); border-radius:999px; padding:6px 12px;
+    font-size:12.5px; font-weight:600; color:var(--ink-soft); transition:all .2s ease;
+  }
+  .progress-item .dot{font-size:13px;}
+  .progress-item.done{background:var(--good-tint); border-color:var(--good); color:var(--good);}
+  #reopenBtn{display:none; margin-left:auto;}
+  #reopenBtn.show{display:inline-flex;}
+
+  /* ---- Completion overlay ---- */
+  .complete-overlay{
+    display:none; position:fixed; inset:0; background:rgba(20,18,10,.72); z-index:300;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .complete-overlay.show{display:flex;}
+  .complete-card{
+    background:var(--paper-raised); border-radius:18px; padding:34px 28px; max-width:440px; width:100%;
+    text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.35); border:1px solid var(--line);
+  }
+  .complete-card .complete-emoji{font-size:54px; line-height:1;}
+  .complete-card h2{font-size:21px; margin:12px 0 16px; color:var(--ink);}
+  .complete-card ul{list-style:none; padding:0; margin:0 0 18px; text-align:left; display:flex; flex-direction:column; gap:8px;}
+  .complete-card li{
+    padding:9px 12px; background:var(--good-tint); border-radius:9px; color:var(--good);
+    font-weight:700; font-size:13.5px;
+  }
+  .complete-card p{color:var(--ink-soft); font-size:14px; margin-bottom:18px;}
+
+  /* ---- card bank ---- */
+  .bank{
+    display:flex; flex-wrap:wrap; gap:10px; padding:14px; border-radius:14px;
+    background:var(--paper-raised); border:1px dashed var(--line-strong); margin-bottom:20px;
+    min-height:60px;
+  }
+  .bank:empty::after{content:"All cards placed — nice work!"; color:var(--ink-faint); font-size:13.5px; font-style:italic;}
+  .card{
+    font-size:14px; line-height:1.35; padding:11px 13px; border-radius:11px;
+    background:var(--paper); border:1px solid var(--line-strong); color:var(--ink);
+    cursor:pointer; max-width:230px; box-shadow:var(--shadow);
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s;
+  }
+  .card:hover{transform:translateY(-2px);}
+  .card.selected{border-color:var(--ink); box-shadow:0 0 0 2px var(--ink) inset;}
+  @media (prefers-reduced-motion: reduce){ .card, .card:hover{transition:none; animation:none; transform:none;} }
+  .card.has-img{padding:0; overflow:hidden; display:flex; flex-direction:column;}
+  .card.has-img img{display:block; width:100%; height:96px; object-fit:cover; background:var(--paper-raised);}
+  .card.has-img span{display:block; padding:9px 12px;}
+  .bin .placed .card.has-img img{height:60px;}
+  .bin .placed .card.has-img span{padding:7px 10px;}
+
+  .bins{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));}
+  .bin{
+    border:2px solid var(--line-strong); border-radius:14px; padding:12px; min-height:110px;
+    background:var(--paper-raised); display:flex; flex-direction:column; gap:8px;
+  }
+  .bin.hot{border-color:var(--ink); box-shadow:0 0 0 3px color-mix(in srgb, var(--ink) 12%, transparent);}
+  .bin h4{font-family:"Fraunces",serif; font-size:15px; font-weight:600; margin:0; display:flex; align-items:center; gap:8px;}
+  .bin .icon{font-size:17px;}
+  .bin .placed{display:flex; flex-direction:column; gap:6px;}
+  .bin .placed .card{cursor:default; font-size:13px; padding:9px 10px;}
+  .bin .placed .card:hover{transform:none;}
+  .bin .placed .card.correct{background:var(--good-tint); border-color:var(--good); color:var(--ink);}
+  .bin .placed .card.incorrect{background:var(--bad-tint); border-color:var(--bad); color:var(--ink);}
+
+  .round-select{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+  .round-btn{
+    font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;
+    padding:8px 14px; border-radius:999px; border:1px solid var(--line-strong);
+    background:var(--paper-raised); color:var(--ink-soft);
+  }
+  .round-btn:hover{border-color:var(--ink-faint);}
+  .round-btn.active{background:var(--forest); border-color:var(--forest); color:#fff;}
+
+  /* ---- Activity 2 climograph cards ---- */
+  .climo-grid{display:grid; gap:18px; grid-template-columns:repeat(auto-fit,minmax(300px,1fr));}
+  .climo-card{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:16px;
+    padding:16px; box-shadow:var(--shadow);
+  }
+  .climo-card h4{font-size:16px; margin-bottom:2px;}
+  .climo-card .loc-sub{color:var(--ink-faint); font-size:12.5px; margin-bottom:10px;}
+  .climo-legend{display:flex; gap:16px; margin-top:4px; margin-bottom:8px; font-size:12px; color:var(--ink-soft);}
+  .climo-legend span{display:flex; align-items:center; gap:6px;}
+  .swatch{width:12px; height:12px; border-radius:3px; display:inline-block;}
+  .swatch.bar{background:var(--precip-bar);}
+  .swatch.line{background:var(--temp-line); border-radius:50%;}
+  .guess-row{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  select.biome-select{
+    flex:1 1 180px; font-family:inherit; font-size:13.5px; padding:9px 10px;
+    border-radius:9px; border:1px solid var(--line-strong); background:var(--paper); color:var(--ink);
+  }
+  .feedback{
+    margin-top:10px; padding:10px 12px; border-radius:10px; font-size:13.5px; display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.correct{background:var(--good-tint); color:var(--ink); border:1px solid var(--good);}
+  .feedback.incorrect{background:var(--bad-tint); color:var(--ink); border:1px solid var(--bad);}
+  .feedback b{display:block; margin-bottom:3px;}
+
+  /* ---- Activity 3 ocean rail ---- */
+  .ocean-rail{margin-bottom:18px; border-radius:16px; overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow); background:#fff;}
+  .ocean-rail svg, .ocean-rail img{display:block; width:100%; height:auto;}
+
+
+  footer.page{padding-block:20px 40px; text-align:center; color:var(--ink-faint); font-size:12.5px;}
+
+  .subhead{
+    display:flex; align-items:baseline; gap:10px; margin:26px 0 12px;
+    padding-top:18px; border-top:1px dashed var(--line-strong);
+  }
+  .subhead:first-of-type{border-top:none; padding-top:0; margin-top:4px;}
+  .subhead h4{font-family:"Fraunces",serif; font-size:16.5px; font-weight:600; margin:0;}
+  .subhead .tag{font-size:12px; color:var(--ink-faint); font-weight:600;}
+
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="eyebrow">Chapter 4 · Ecosystems and Communities</div>
+    <h1>Biome &amp; Ocean Sort Lab</h1>
+    <p>Three card-sort challenges — sized for a full class period — for Lessons 4.4 (Biomes) and 4.5 (Aquatic Ecosystems), built from Miller &amp; Levine Biology, Foundation Edition. Tap a card, then tap where it belongs. Nothing is marked right or wrong until every card is placed and you hit <b>Check answers</b> — then correct ones turn green, incorrect ones turn red, and Reset starts that round over.</p>
+  </header>
+
+  <div class="progress-strip" id="progressStrip">
+    <div class="progress-item" id="prog-t1r1"><span class="dot">○</span> 1 · Round 1</div>
+    <div class="progress-item" id="prog-t1r2"><span class="dot">○</span> 1 · Round 2</div>
+    <div class="progress-item" id="prog-t1r3"><span class="dot">○</span> 1 · Round 3</div>
+    <div class="progress-item" id="prog-t2"><span class="dot">○</span> 2 · Climate Graphs</div>
+    <div class="progress-item" id="prog-t3a"><span class="dot">○</span> 3 · Part A</div>
+    <div class="progress-item" id="prog-t3b"><span class="dot">○</span> 3 · Part B</div>
+    <button class="btn primary" id="reopenBtn">🏆 Show results</button>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="t1" data-accent="forest"><span class="dot"></span>1 · Adaptation Match</button>
+    <button class="tab-btn" data-tab="t2" data-accent="amber"><span class="dot"></span>2 · Climate Graph Detective</button>
+    <button class="tab-btn" data-tab="t3" data-accent="ocean"><span class="dot"></span>3 · Aquatic Ecosystem Sort</button>
+  </nav>
+
+  <!-- ============ ACTIVITY 1 ============ -->
+  <section class="panel active" id="t1" data-accent="forest">
+    <div class="brief" data-accent="forest">
+      <div class="num">1</div>
+      <div>
+        <h3>Adaptation Match</h3>
+        <p>Every organism is built for its biome. Read each adaptation card and place it in the biome bin where that trait would actually help an organism survive. Place all the cards, then hit <b>Check answers</b> — correct matches turn green, incorrect ones turn red. If anything's wrong, hit <b>Reset</b> and sort again.</p>
+        <div class="meta">
+          <span class="meta-chip">⏱ ~20 minutes (3 rounds)</span>
+          <span class="meta-chip">🎯 Recognition + Understanding</span>
+          <span class="meta-chip">🃏 30 cards across 3 rounds</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="round-select" id="t1-round-select">
+      <button class="round-btn active" data-round="1">Round 1</button>
+      <button class="round-btn" data-round="2">Round 2 · Challenge</button>
+      <button class="round-btn" data-round="3">Round 3 · Real-World</button>
+    </div>
+
+    <div class="scoreboard">
+      <div class="track"><div class="fill" id="t1-fill"></div></div>
+      <div class="count" id="t1-count">0 / 10 placed</div>
+      <button class="btn primary" id="t1-check" disabled>Check answers</button>
+      <button class="btn ghost" id="t1-reset">Reset round</button>
+    </div>
+
+    <div class="bank" id="t1-bank"></div>
+    <div class="bins" id="t1-bins"></div>
+  </section>
+
+  <!-- ============ ACTIVITY 2 ============ -->
+  <section class="panel" id="t2" data-accent="amber">
+    <div class="brief" data-accent="amber">
+      <div class="num">2</div>
+      <div>
+        <h3>Climate Graph Detective</h3>
+        <p>Each graph is one field station's climate record for a year — the orange line is average monthly temperature (left axis), the blue bars are average monthly precipitation (right axis). All ten graphs share the <em>same scale</em>, so you can compare them directly. Use the 3-step method (temperature pattern → rainfall amount → seasonal shape) to pick a biome for every station, then hit <b>Check all answers</b> — correct picks turn green, incorrect ones turn red. If anything's wrong, hit <b>Reset</b> and try again.</p>
+        <div class="meta">
+          <span class="meta-chip">⏱ ~16 minutes</span>
+          <span class="meta-chip">🎯 Recognition + Understanding</span>
+          <span class="meta-chip">📊 10 mystery stations</span>
+        </div>
+      </div>
+    </div>
+    <div class="scoreboard">
+      <div class="track"><div class="fill" id="t2-fill"></div></div>
+      <div class="count" id="t2-count">0 / 10 answered</div>
+      <button class="btn primary" id="t2-check" disabled>Check all answers</button>
+      <button class="btn ghost" id="t2-reset">Reset</button>
+    </div>
+    <div class="climo-grid" id="t2-grid"></div>
+  </section>
+
+  <!-- ============ ACTIVITY 3 ============ -->
+  <section class="panel" id="t3" data-accent="ocean">
+    <div class="brief" data-accent="ocean">
+      <div class="num">3</div>
+      <div>
+        <h3>Aquatic Ecosystem Sort</h3>
+        <p>Aquatic ecosystems are organized by water chemistry, depth, and distance from shore. Part A sorts ecosystem types into the three big categories; Part B zooms into the ocean's own zones using the cross-section below. In each part, place every card, then hit <b>Check answers</b> — correct matches turn green, incorrect ones turn red. If anything's wrong, hit <b>Reset</b> and sort again.</p>
+        <div class="meta">
+          <span class="meta-chip">⏱ ~20 minutes (2 parts)</span>
+          <span class="meta-chip">🎯 Recognition + Understanding</span>
+          <span class="meta-chip">🃏 23 clues across 2 parts</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="subhead">
+      <h4>Part A · Freshwater, Estuary, or Marine?</h4>
+      <span class="tag">11 cards · 3 categories</span>
+    </div>
+    <div class="scoreboard">
+      <div class="track"><div class="fill" id="t3a-fill"></div></div>
+      <div class="count" id="t3a-count">0 / 11 placed</div>
+      <button class="btn primary" id="t3a-check" disabled>Check answers</button>
+      <button class="btn ghost" id="t3a-reset">Reset</button>
+    </div>
+    <div class="bank" id="t3a-bank"></div>
+    <div class="bins" id="t3a-bins"></div>
+
+    <div class="subhead">
+      <h4>Part B · Ocean Zones in Detail</h4>
+      <span class="tag">12 cards · 5 zones</span>
+    </div>
+    <div class="ocean-rail" id="t3-diagram"></div>
+    <div class="scoreboard">
+      <div class="track"><div class="fill" id="t3b-fill"></div></div>
+      <div class="count" id="t3b-count">0 / 12 placed</div>
+      <button class="btn primary" id="t3b-check" disabled>Check answers</button>
+      <button class="btn ghost" id="t3b-reset">Reset</button>
+    </div>
+    <div class="bank" id="t3b-bank"></div>
+    <div class="bins" id="t3b-bins"></div>
+  </section>
+
+
+  <footer class="page">Built from Miller &amp; Levine Biology, Foundation Edition — Chapter 4, Lessons 4.4–4.5.</footer>
+</div>
+
+<div class="complete-overlay" id="completeOverlay">
+  <div class="complete-card">
+    <div class="complete-emoji">🎉</div>
+    <h2>All three activities complete!</h2>
+    <ul id="complete-list"></ul>
+    <p>📸 Take a screenshot of this screen and show it to your teacher.</p>
+    <button class="btn primary" id="closeOverlayBtn">Close</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------------------------------------------------
+     TAB SWITCHING
+  --------------------------------------------------------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  var panels = document.querySelectorAll(".panel");
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); });
+      panels.forEach(function(p){ p.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.tab).classList.add("active");
+    });
+  });
+
+  /* ---------------------------------------------------------
+     COMPLETION TRACKING — lets a student finish everything and
+     show a single "all done" screen to take a screenshot of.
+  --------------------------------------------------------- */
+  var completionOrder = ["t1r1","t1r2","t1r3","t2","t3a","t3b"];
+  var completionLabels = {
+    t1r1:"Activity 1 · Round 1 — Adaptation Match",
+    t1r2:"Activity 1 · Round 2 — Adaptation Match (Challenge)",
+    t1r3:"Activity 1 · Round 3 — Adaptation Match (Real-World)",
+    t2:"Activity 2 · Climate Graph Detective",
+    t3a:"Activity 3 · Part A — Ecosystem Categories",
+    t3b:"Activity 3 · Part B — Ocean Zones"
+  };
+  var completion = {};
+  completionOrder.forEach(function(k){ completion[k] = false; });
+
+  function setComplete(key, val){
+    completion[key] = val;
+    var item = document.getElementById("prog-"+key);
+    if(item){
+      item.classList.toggle("done", val);
+      var dot = item.querySelector(".dot");
+      if(dot) dot.textContent = val ? "✅" : "○";
+    }
+    var allDone = completionOrder.every(function(k){ return completion[k]; });
+    var reopenBtn = document.getElementById("reopenBtn");
+    if(allDone){
+      if(reopenBtn) reopenBtn.classList.add("show");
+      if(val) openCompleteOverlay();
+    } else if(reopenBtn){
+      reopenBtn.classList.remove("show");
+    }
+  }
+
+  function openCompleteOverlay(){
+    var list = document.getElementById("complete-list");
+    if(list){
+      list.innerHTML = completionOrder.map(function(k){
+        return "<li>✅ "+completionLabels[k]+"</li>";
+      }).join("");
+    }
+    document.getElementById("completeOverlay").classList.add("show");
+  }
+  function closeCompleteOverlay(){
+    document.getElementById("completeOverlay").classList.remove("show");
+  }
+  document.getElementById("reopenBtn").addEventListener("click", openCompleteOverlay);
+  document.getElementById("closeOverlayBtn").addEventListener("click", closeCompleteOverlay);
+
+  /* ---------------------------------------------------------
+     SHUFFLE HELPER (Fisher-Yates) — never show cards pre-sorted
+  --------------------------------------------------------- */
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var tmp = a[i]; a[i]=a[j]; a[j]=tmp;
+    }
+    return a;
+  }
+
+  /* ---------------------------------------------------------
+     GENERIC CLICK-TO-SORT ENGINE
+     Used by Activity 1 and Activity 3.
+     Students place every card first; nothing is marked right or
+     wrong until they press Check. Then Reset is the only way to
+     try again — there is no per-card do-over.
+  --------------------------------------------------------- */
+  function buildSort(opts){
+    // opts: bankEl, binsEl, bins:[{id,label,icon}], cards:[{id,text,bin}] (pre-shuffled by caller),
+    //       onProgress(placedCount, total), onChecked(correctCount, total)
+    var state = { selected:null, placement:{}, checked:false };
+    var total = opts.cards.length;
+
+    function renderBank(){
+      opts.bankEl.innerHTML = "";
+      opts.cards.forEach(function(card){
+        if(state.placement[card.id] !== undefined) return;
+        var el = document.createElement("div");
+        el.className = "card";
+        if(card.img){
+          el.classList.add("has-img");
+          var thumb = document.createElement("img");
+          thumb.src = card.img;
+          thumb.alt = "";
+          el.appendChild(thumb);
+          var cap = document.createElement("span");
+          cap.textContent = card.text;
+          el.appendChild(cap);
+        } else {
+          el.textContent = card.text;
+        }
+        el.dataset.id = card.id;
+        if(state.selected === card.id) el.classList.add("selected");
+        el.addEventListener("click", function(){
+          if(state.checked) return;
+          state.selected = (state.selected === card.id) ? null : card.id;
+          renderBank();
+        });
+        opts.bankEl.appendChild(el);
+      });
+    }
+
+    function renderBins(){
+      opts.binsEl.innerHTML = "";
+      opts.bins.forEach(function(bin){
+        var wrap = document.createElement("div");
+        wrap.className = "bin";
+        wrap.dataset.id = bin.id;
+        var h4 = document.createElement("h4");
+        h4.innerHTML = '<span class="icon">' + (bin.icon || "•") + '</span>' + bin.label;
+        wrap.appendChild(h4);
+        var placedWrap = document.createElement("div");
+        placedWrap.className = "placed";
+        Object.keys(state.placement).forEach(function(cardId){
+          if(state.placement[cardId] === bin.id){
+            var card = opts.cards.find(function(c){ return c.id === cardId; });
+            var cel = document.createElement("div");
+            var isCorrect = card.bin === bin.id;
+            cel.className = "card" + (state.checked ? (isCorrect ? " correct" : " incorrect") : "");
+            var prefix = state.checked ? (isCorrect ? "✓ " : "✗ ") : "";
+            if(card.img){
+              cel.classList.add("has-img");
+              var thumb2 = document.createElement("img");
+              thumb2.src = card.img;
+              thumb2.alt = "";
+              cel.appendChild(thumb2);
+              var cap2 = document.createElement("span");
+              cap2.textContent = prefix + card.text;
+              cel.appendChild(cap2);
+            } else {
+              cel.textContent = prefix + card.text;
+            }
+            placedWrap.appendChild(cel);
+          }
+        });
+        wrap.appendChild(placedWrap);
+        wrap.addEventListener("click", function(){
+          if(state.checked || !state.selected) return;
+          state.placement[state.selected] = bin.id;
+          state.selected = null;
+          renderBank(); renderBins();
+          opts.onProgress(Object.keys(state.placement).length, total);
+        });
+        opts.binsEl.appendChild(wrap);
+      });
+    }
+
+    function check(){
+      if(state.checked || Object.keys(state.placement).length < total) return;
+      state.checked = true;
+      state.selected = null;
+      renderBank(); renderBins();
+      var correctCount = opts.cards.filter(function(c){ return state.placement[c.id] === c.bin; }).length;
+      opts.onChecked(correctCount, total);
+    }
+
+    function reset(){
+      state.selected = null;
+      state.placement = {};
+      state.checked = false;
+      renderBank(); renderBins();
+      opts.onProgress(0, total);
+    }
+
+    renderBank(); renderBins();
+    return { reset: reset, check: check };
+  }
+
+  /* ---------------------------------------------------------
+     ACTIVITY 1 — ADAPTATION MATCH
+  --------------------------------------------------------- */
+  var biomeBins = [
+    {id:"trf", label:"Tropical Rain Forest", icon:"🌴"},
+    {id:"tdf", label:"Tropical Dry Forest", icon:"🍂"},
+    {id:"sav", label:"Tropical Savanna", icon:"🦒"},
+    {id:"des", label:"Desert", icon:"🌵"},
+    {id:"tg",  label:"Temperate Grassland", icon:"🌾"},
+    {id:"tws", label:"Temperate Woodland &amp; Shrubland", icon:"🌳"},
+    {id:"tf",  label:"Temperate Forest", icon:"🍁"},
+    {id:"nwc", label:"NW Coniferous Forest", icon:"🌲"},
+    {id:"taiga", label:"Taiga (Boreal Forest)", icon:"🌲"},
+    {id:"tun", label:"Tundra", icon:"❄️"}
+  ];
+
+  var round1Cards = [
+    {id:"r1-1", bin:"trf", img:"cards/r1-1.png", text:"Broad leaves in the shaded understory maximize surface area to catch filtered sunlight beneath a dense canopy."},
+    {id:"r1-2", bin:"tdf", img:"cards/r1-2.png", text:"Trees are deciduous, dropping their leaves to conserve water through a long dry season."},
+    {id:"r1-3", bin:"sav", img:"cards/r1-3.png", text:"Grasses regrow quickly from underground stems after seasonal fires and heavy grazing."},
+    {id:"r1-4", bin:"des", img:"cards/r1-4.png", text:"Thick, waxy stems store water, and a small surface-area-to-volume ratio limits water loss."},
+    {id:"r1-5", bin:"tg",  img:"cards/r1-5.png", text:"Deep, extensive root systems let grasses survive both grazing animals and periodic fires."},
+    {id:"r1-6", bin:"tws", img:"cards/r1-6.png", text:"Tough, waxy leaves resist water loss through hot, dry summers."},
+    {id:"r1-7", bin:"tf",  img:"cards/r1-7.png", text:"Deciduous trees drop their leaves in autumn and go dormant for the cold winter."},
+    {id:"r1-8", bin:"nwc", img:"cards/r1-8.png", text:"Abundant year-round rain and mild temperatures support some of the tallest trees on Earth."},
+    {id:"r1-9", bin:"taiga", img:"cards/r1-9.png", text:"Cone-shaped conifers shed heavy snow, and their waxy needles reduce water loss in winter."},
+    {id:"r1-10", bin:"tun", img:"cards/r1-10.png", text:"Plants grow low to the ground, avoiding damaging winds and using a shallow layer of thawed summer soil."}
+  ];
+
+  var round2Cards = [
+    {id:"r2-1", bin:"trf", img:"cards/r2-1.png", text:"Animals stay active year-round and often rely on camouflage to avoid predators in the dense vegetation."},
+    {id:"r2-2", bin:"tdf", img:"cards/r2-2.png", text:"Some animals enter estivation — a dry-season inactivity similar to hibernation — to conserve water."},
+    {id:"r2-3", bin:"sav", img:"cards/r2-3.png", text:"Large herbivores migrate long distances to follow seasonal rains and fresh grass."},
+    {id:"r2-4", bin:"des", img:"cards/r2-4.png", text:"Many animals are nocturnal, staying active at night to avoid extreme daytime heat."},
+    {id:"r2-5", bin:"tg",  img:"cards/r2-5.png", text:"Small animals burrow underground to escape predators in the open, treeless landscape."},
+    {id:"r2-6", bin:"tws", img:"cards/r2-6.png", text:"Animals are browsers, feeding on a varied diet of grasses, leaves, and shrubs."},
+    {id:"r2-7", bin:"tf",  img:"cards/r2-7.png", text:"Moss commonly covers tree trunks and the fertile, humus-rich forest floor."},
+    {id:"r2-8", bin:"nwc", img:"cards/r2-8.png", text:"Camouflage helps insects and ground-dwelling mammals avoid predators in the dense understory."},
+    {id:"r2-9", bin:"taiga", img:"cards/r2-9.png", text:"Animals have small ears and limbs plus thick fur, which helps them conserve body heat through long winters."},
+    {id:"r2-10", bin:"tun", img:"cards/r2-10.png", text:"Many animals migrate away for winter; year-round residents rely on natural antifreeze adaptations."}
+  ];
+
+  var round3Cards = [
+    {id:"r3-1", bin:"trf", img:"cards/r3-1.png", text:"The Amazon Basin gets more than 2 meters of rain every year and never has a true dry season — trees compete fiercely for sunlight."},
+    {id:"r3-2", bin:"tdf", img:"cards/r3-2.png", text:"Parts of India experience a rainy season intense enough to rival a rain forest's total, followed by months without a single drop."},
+    {id:"r3-3", bin:"sav", img:"cards/r3-3.png", text:"The Serengeti's grasslands support massive herds that migrate hundreds of kilometers chasing the seasonal rains."},
+    {id:"r3-4", bin:"des", img:"cards/r3-4.png", text:"The Sahara receives less than 25 cm of rain a year, and daytime heat can be lethal without shade or water."},
+    {id:"r3-5", bin:"tg",  img:"cards/r3-5.png", text:"The American prairies were once covered in deep-rooted grasses adapted to both wildfire and grazing bison."},
+    {id:"r3-6", bin:"tws", img:"cards/r3-6.png", text:"California's chaparral hillsides are covered in tough, oily shrubs that burn easily in hot, dry summers."},
+    {id:"r3-7", bin:"tf",  img:"cards/r3-7.png", text:"New England's forests turn brilliant colors each fall as deciduous trees prepare to drop their leaves for winter."},
+    {id:"r3-8", bin:"nwc", img:"cards/r3-8.png", text:"The Pacific Northwest's old-growth forests are sometimes called “temperate rain forests” because of how much rain falls there."},
+    {id:"r3-9", bin:"taiga", img:"cards/r3-9.png", text:"Siberia's vast coniferous forests endure winters that can stay below -40°C for months at a time."},
+    {id:"r3-10", bin:"tun", img:"cards/r3-10.png", text:"Above the Arctic Circle, permafrost keeps the subsoil frozen year-round, limiting plant roots to just a few thawed centimeters."}
+  ];
+
+  var t1Rounds = [
+    {n:1, cards:round1Cards, label:" (Round 1)"},
+    {n:2, cards:round2Cards, label:" (Round 2 · Challenge)"},
+    {n:3, cards:round3Cards, label:" (Round 3 · Real-World Locations)"}
+  ];
+
+  var t1Fill = document.getElementById("t1-fill");
+  var t1Count = document.getElementById("t1-count");
+  var t1Bank = document.getElementById("t1-bank");
+  var t1Bins = document.getElementById("t1-bins");
+  var t1CheckBtn = document.getElementById("t1-check");
+  var t1Engine = null;
+
+  function startT1Round(roundNum){
+    document.querySelectorAll("#t1-round-select .round-btn").forEach(function(b){
+      b.classList.toggle("active", Number(b.dataset.round) === roundNum);
+    });
+    var round = t1Rounds[roundNum-1];
+    var compKey = "t1r"+roundNum;
+    setComplete(compKey, false);
+    t1Bank.innerHTML = ""; t1Bins.innerHTML = "";
+    t1CheckBtn.disabled = true;
+    t1Engine = buildSort({
+      bankEl:t1Bank, binsEl:t1Bins, bins:biomeBins, cards:shuffle(round.cards),
+      onProgress:function(done,total){
+        t1Fill.style.width = (done/total*100)+"%";
+        t1Count.textContent = done+" / "+total+" placed"+round.label;
+        t1CheckBtn.disabled = (done !== total);
+      },
+      onChecked:function(correct,total){
+        t1CheckBtn.disabled = true;
+        t1Count.textContent = (correct===total)
+          ? "All "+total+" correct"+round.label+" — nice work! 🎉"
+          : correct+" / "+total+" correct"+round.label+" — hit Reset to try again.";
+        if(correct===total) setComplete(compKey, true);
+      }
+    });
+  }
+
+  document.querySelectorAll("#t1-round-select .round-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){ startT1Round(Number(btn.dataset.round)); });
+  });
+  t1CheckBtn.addEventListener("click", function(){ t1Engine.check(); });
+  document.getElementById("t1-reset").addEventListener("click", function(){
+    var current = document.querySelector("#t1-round-select .round-btn.active");
+    startT1Round(current ? Number(current.dataset.round) : 1);
+  });
+
+  startT1Round(1);
+
+  /* ---------------------------------------------------------
+     ACTIVITY 2 — CLIMATE GRAPH DETECTIVE
+  --------------------------------------------------------- */
+  var months = ["J","F","M","A","M","J","J","A","S","O","N","D"];
+  var TEMP_MIN=-30, TEMP_MAX=40, PRECIP_MAX=260;
+
+  var biomeOptions = [
+    "Tropical Rain Forest","Tropical Dry Forest","Tropical Savanna","Desert",
+    "Temperate Grassland","Temperate Woodland & Shrubland","Temperate Forest",
+    "NW Coniferous Forest","Taiga (Boreal Forest)","Tundra"
+  ];
+
+  var climoData = [
+    {
+      id:"st-1", name:"Station 1", biome:"Tropical Rain Forest",
+      temp:[26,26,26,26,26,26,26,27,27,27,26,26],
+      precip:[210,200,220,230,240,250,240,230,220,235,230,225],
+      explain:"Flat, hot temperature all year (~26–27°C) plus heavy rain every single month (over 2,700 mm/yr total) — no dry season at all. That combination only happens in a Tropical Rain Forest."
+    },
+    {
+      id:"st-2", name:"Station 2", biome:"Desert",
+      temp:[13,16,19,23,28,33,35,35,32,25,18,13],
+      precip:[2,1,0,3,5,15,20,25,15,8,10,6],
+      explain:"Huge temperature swing across the year and, more importantly, almost no rain at all (about 110 mm/yr total). Low precipitation is the strongest single clue for a Desert, regardless of the temperature pattern."
+    },
+    {
+      id:"st-3", name:"Station 3", biome:"Temperate Grassland",
+      temp:[-8,-6,0,7,14,20,23,22,16,8,0,-6],
+      precip:[40,35,40,45,55,60,65,60,50,45,45,40],
+      explain:"Warm summers (23°C) and cold winters (-8°C) with moderate, fairly steady rainfall (about 580 mm/yr) — too dry and too seasonal for a forest, but wetter and more temperate than a desert or taiga. That's Temperate Grassland."
+    },
+    {
+      id:"st-4", name:"Station 4", biome:"Taiga (Boreal Forest)",
+      temp:[-22,-20,-12,-2,6,12,15,13,6,-4,-14,-20],
+      precip:[35,30,32,38,45,50,55,50,42,38,35,32],
+      explain:"Similar steady rainfall to Station 3, but the temperature tells a different story: brutally cold winters (-22°C) and only a short, mild summer (15°C). That long cold season and coniferous-forest climate is Taiga."
+    },
+    {
+      id:"st-5", name:"Station 5", biome:"Tropical Savanna",
+      temp:[26,27,28,30,29,27,25,25,26,27,27,26],
+      precip:[10,10,20,120,200,220,180,90,30,10,10,10],
+      explain:"Warm year-round temperatures (25–30°C) like a rain forest, but the rain is squeezed into one sharp wet season, with several nearly rainless months on either side. That strong wet/dry split with warm temperatures is the signature of a Tropical Savanna."
+    },
+    {
+      id:"st-6", name:"Station 6", biome:"Tundra",
+      temp:[-14,-15,-12,-6,0,4,6,5,1,-5,-10,-13],
+      precip:[15,12,15,18,20,25,28,25,20,18,15,14],
+      explain:"Cold almost the entire year, with only a brief, cool summer peak (6°C) and low precipitation throughout (about 225 mm/yr). That short, cool growing season and low rainfall points to Tundra."
+    },
+    {
+      id:"st-7", name:"Station 7", biome:"Tropical Dry Forest",
+      temp:[30,32,32,31,29,27,26,26,27,28,29,30],
+      precip:[0,0,5,40,140,210,240,220,140,55,10,0],
+      explain:"Warm year-round like a rain forest or savanna, but the rain is even heavier than a savanna's (over 1,000 mm/yr) and falls in one long wet stretch followed by a true drought with essentially zero rain. That rain-then-drought extreme is Tropical Dry Forest."
+    },
+    {
+      id:"st-8", name:"Station 8", biome:"Temperate Woodland & Shrubland",
+      temp:[10,11,13,15,18,22,25,25,22,18,13,10],
+      precip:[90,80,70,40,20,5,2,3,15,45,70,95],
+      explain:"Mild temperatures year-round, but rainfall flips the usual pattern — wet, cool winters and almost no rain in hot summers. That hot-dry-summer / cool-wet-winter split is the signature of Temperate Woodland and Shrubland."
+    },
+    {
+      id:"st-9", name:"Station 9", biome:"Temperate Forest",
+      temp:[0,2,7,13,18,23,25,24,20,13,7,2],
+      precip:[80,75,85,90,95,100,95,90,85,90,85,80],
+      explain:"Cold-to-moderate winters, warm summers, and steady rain spread evenly across every month (over 1,000 mm/yr) with no real dry season — fertile, well-watered conditions typical of a Temperate Forest."
+    },
+    {
+      id:"st-10", name:"Station 10", biome:"NW Coniferous Forest",
+      temp:[4,5,7,9,12,15,17,17,14,10,6,4],
+      precip:[180,150,140,90,60,30,15,20,50,120,170,190],
+      explain:"Mild temperatures all year (never far below freezing, never very hot) with heavy rain in fall, winter, and spring but a distinctly drier summer. That mild-and-wet-most-of-the-year pattern points to the NW Coniferous Forest."
+    }
+  ];
+
+  var TEMP_TICKS = [40, 20, 0, -20];
+  var PRECIP_TICKS = [0, 100, 200];
+
+  function buildClimoSVG(entry){
+    var W=340, H=210, padL=34, padR=38, padT=16, padB=24;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var colW = plotW / 12;
+    function xAt(i){ return padL + colW*i + colW/2; }
+    function precipY(v){ return padT + plotH - (v/PRECIP_MAX)*plotH; }
+    function tempY(v){ return padT + plotH - ((v-TEMP_MIN)/(TEMP_MAX-TEMP_MIN))*plotH; }
+
+    var svg = '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Climate graph for '+entry.name+'">';
+
+    // gridlines + temperature axis ticks (left)
+    TEMP_TICKS.forEach(function(t){
+      var y = tempY(t);
+      var isZero = t === 0;
+      svg += '<line x1="'+padL+'" y1="'+y.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y.toFixed(1)+'" stroke="'+(isZero?"var(--line-strong)":"var(--line)")+'" stroke-width="1" '+(isZero?"":'stroke-dasharray="3,3"')+'/>';
+      svg += '<text x="'+(padL-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-size="8.5" fill="var(--temp-line)" font-family="IBM Plex Mono, monospace">'+t+'°</text>';
+    });
+    // precipitation axis ticks (right)
+    PRECIP_TICKS.forEach(function(p){
+      var y = precipY(p);
+      svg += '<text x="'+(W-padR+6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="start" font-size="8.5" fill="var(--precip-bar)" font-family="IBM Plex Mono, monospace">'+p+'</text>';
+      svg += '<line x1="'+(W-padR)+'" y1="'+y.toFixed(1)+'" x2="'+(W-padR+3)+'" y2="'+y.toFixed(1)+'" stroke="var(--precip-bar)" stroke-width="1"/>';
+    });
+    // axis frame
+    svg += '<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(padT+plotH)+'" stroke="var(--line-strong)" stroke-width="1"/>';
+    svg += '<line x1="'+(W-padR)+'" y1="'+padT+'" x2="'+(W-padR)+'" y2="'+(padT+plotH)+'" stroke="var(--line-strong)" stroke-width="1"/>';
+    svg += '<line x1="'+padL+'" y1="'+(padT+plotH)+'" x2="'+(W-padR)+'" y2="'+(padT+plotH)+'" stroke="var(--line-strong)" stroke-width="1"/>';
+
+    // axis titles
+    svg += '<text x="'+padL+'" y="10" font-size="8" fill="var(--temp-line)" font-family="IBM Plex Mono, monospace" font-weight="600">°C</text>';
+    svg += '<text x="'+(W-padR)+'" y="10" text-anchor="end" font-size="8" fill="var(--precip-bar)" font-family="IBM Plex Mono, monospace" font-weight="600">mm</text>';
+
+    // precipitation bars
+    var barW = colW*0.55;
+    entry.precip.forEach(function(v,i){
+      var y = precipY(Math.min(v, PRECIP_MAX));
+      var x = xAt(i) - barW/2;
+      svg += '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+barW.toFixed(1)+'" height="'+((padT+plotH)-y).toFixed(1)+'" rx="2" fill="var(--precip-bar)" opacity="0.85"/>';
+    });
+
+    // temperature line
+    var pts = entry.temp.map(function(v,i){ return xAt(i).toFixed(1)+","+tempY(v).toFixed(1); }).join(" ");
+    svg += '<polyline points="'+pts+'" fill="none" stroke="var(--temp-line)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+    entry.temp.forEach(function(v,i){
+      svg += '<circle cx="'+xAt(i).toFixed(1)+'" cy="'+tempY(v).toFixed(1)+'" r="2.6" fill="var(--temp-line)"/>';
+    });
+
+    // month labels
+    months.forEach(function(m,i){
+      svg += '<text x="'+xAt(i).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" font-size="8" fill="var(--ink-faint)" font-family="IBM Plex Mono, monospace">'+m+'</text>';
+    });
+
+    svg += '</svg>';
+    return svg;
+  }
+
+  var t2Grid = document.getElementById("t2-grid");
+  var t2Fill = document.getElementById("t2-fill");
+  var t2Count = document.getElementById("t2-count");
+  var t2CheckBtn = document.getElementById("t2-check");
+  var t2Order = [];   // shuffled display order, rebuilt on each render
+  var t2Correct = {}; // entry.id -> true once that station has been answered correctly
+
+  function renderClimoGrid(){
+    t2Grid.innerHTML = "";
+    t2Correct = {};
+    setComplete("t2", false);
+    t2CheckBtn.disabled = true;
+    t2Order = shuffle(climoData);
+    t2Order.forEach(function(entry){
+      var card = document.createElement("div");
+      card.className = "climo-card";
+      card.id = "card-"+entry.id;
+      card.innerHTML =
+        '<h4>'+entry.name+' — Climate Record</h4>'+
+        '<div class="loc-sub">Total annual precipitation: '+entry.precip.reduce(function(a,b){return a+b;},0).toLocaleString()+' mm</div>'+
+        '<div class="climo-legend"><span><i class="swatch line"></i>Temperature °C (left axis)</span><span><i class="swatch bar"></i>Precipitation mm (right axis)</span></div>'+
+        buildClimoSVG(entry)+
+        '<div class="guess-row">'+
+          '<select class="biome-select" id="sel-'+entry.id+'">'+
+            '<option value="">Choose the biome…</option>'+
+            biomeOptions.map(function(b){ return '<option value="'+b+'">'+b+'</option>'; }).join("")+
+          '</select>'+
+        '</div>'+
+        '<div class="feedback" id="fb-'+entry.id+'"></div>';
+      t2Grid.appendChild(card);
+
+      var sel = card.querySelector(".biome-select");
+      sel.addEventListener("change", function(){
+        // picking a new answer clears any stale "not quite" feedback for this station
+        if(!t2Correct[entry.id]){
+          var fb = document.getElementById("fb-"+entry.id);
+          fb.className = "feedback";
+          fb.innerHTML = "";
+          card.style.borderColor = "";
+        }
+        updateT2Progress();
+      });
+    });
+
+    updateT2Progress();
+  }
+
+  function updateT2Progress(){
+    var total = climoData.length;
+    var correctCount = Object.keys(t2Correct).length;
+    var pending = t2Order.filter(function(entry){ return !t2Correct[entry.id]; });
+    var pendingAnswered = pending.filter(function(entry){
+      var sel = document.getElementById("sel-"+entry.id);
+      return sel && sel.value;
+    }).length;
+    t2Fill.style.width = (correctCount/total*100)+"%";
+    if(correctCount === total){
+      t2Count.textContent = "All "+total+" correct — nice work! 🎉";
+      t2CheckBtn.disabled = true;
+      setComplete("t2", true);
+    } else {
+      t2Count.textContent = correctCount+" / "+total+" correct so far ("+pendingAnswered+" / "+pending.length+" ready to check)";
+      t2CheckBtn.disabled = (pending.length === 0) || (pendingAnswered !== pending.length);
+    }
+  }
+
+  function checkAllClimo(){
+    var pending = t2Order.filter(function(entry){ return !t2Correct[entry.id]; });
+    pending.forEach(function(entry){
+      var sel = document.getElementById("sel-"+entry.id);
+      var fb = document.getElementById("fb-"+entry.id);
+      var card = document.getElementById("card-"+entry.id);
+      var isCorrect = sel.value === entry.biome;
+      if(isCorrect){
+        t2Correct[entry.id] = true;
+        sel.disabled = true;
+        card.style.borderColor = "var(--good)";
+        fb.className = "feedback show correct";
+        fb.innerHTML = "<b>Correct — " + entry.biome + ".</b>" + entry.explain;
+      } else {
+        // wrong: no answer or explanation revealed — just a nudge to try again
+        card.style.borderColor = "var(--bad)";
+        fb.className = "feedback show incorrect";
+        fb.innerHTML = "<b>Not quite — try again.</b>Re-read the graph and pick another biome.";
+        sel.value = "";
+      }
+    });
+    updateT2Progress();
+  }
+
+  t2CheckBtn.addEventListener("click", checkAllClimo);
+  document.getElementById("t2-reset").addEventListener("click", renderClimoGrid);
+
+  renderClimoGrid();
+
+  /* ---------------------------------------------------------
+     ACTIVITY 3, PART A — FRESHWATER / ESTUARY / MARINE
+  --------------------------------------------------------- */
+  var categoryBins = [
+    {id:"fresh", label:"Freshwater Ecosystem", icon:"💧"},
+    {id:"estuary", label:"Estuary", icon:"🌾"},
+    {id:"marine", label:"Marine Ecosystem", icon:"🌊"}
+  ];
+
+  var categoryCards = [
+    {id:"c1", bin:"fresh", text:"Rivers and streams often begin from underground water sources high in mountains or hills."},
+    {id:"c2", bin:"fresh", text:"Lakes and ponds have food webs based on plankton and algae, with water circulating seasonally to distribute heat and nutrients."},
+    {id:"c3", bin:"fresh", text:"Bogs are cool, waterlogged, acidic, and nutrient-poor, dominated by sphagnum moss."},
+    {id:"c4", bin:"fresh", text:"Marshes are shallow and nutrient-rich, dominated by grasses and reeds rather than trees."},
+    {id:"c5", bin:"fresh", text:"Swamps have trees and shrubs growing directly in standing water in warm, low-lying areas."},
+    {id:"c6", bin:"estuary", text:"This wetland forms where a river meets the ocean, mixing fresh water with salt water and rising and falling with the tides."},
+    {id:"c7", bin:"estuary", text:"Salt marshes are temperate wetlands with salt-tolerant grasses above the low-tide line — Chesapeake Bay is one example."},
+    {id:"c8", bin:"estuary", text:"Mangrove swamps are tropical wetlands identified by salt-tolerant trees — Florida's Everglades is one example."},
+    {id:"c9", bin:"estuary", text:"These ecosystems serve as breeding and nursery grounds for many commercially important fish and shellfish species."},
+    {id:"c10", bin:"marine", text:"Ecologists divide this environment into zones based on depth and distance from the shore."},
+    {id:"c11", bin:"marine", text:"Covers almost three-fourths of Earth's surface, from sunlit shallows to the permanently dark deep sea."}
+  ];
+
+  var t3aFill = document.getElementById("t3a-fill");
+  var t3aCount = document.getElementById("t3a-count");
+  var t3aBank = document.getElementById("t3a-bank");
+  var t3aBins = document.getElementById("t3a-bins");
+  var t3aCheckBtn = document.getElementById("t3a-check");
+  var t3aEngine = buildSort({
+    bankEl:t3aBank, binsEl:t3aBins, bins:categoryBins, cards:shuffle(categoryCards),
+    onProgress:function(done,total){
+      t3aFill.style.width = (done/total*100)+"%";
+      t3aCount.textContent = done+" / "+total+" placed";
+      t3aCheckBtn.disabled = (done !== total);
+    },
+    onChecked:function(correct,total){
+      t3aCheckBtn.disabled = true;
+      t3aCount.textContent = (correct===total)
+        ? "All "+total+" correct — on to Part B! 🎉"
+        : correct+" / "+total+" correct — hit Reset to try again.";
+      if(correct===total) setComplete("t3a", true);
+    }
+  });
+
+  t3aCheckBtn.addEventListener("click", function(){ t3aEngine.check(); });
+  document.getElementById("t3a-reset").addEventListener("click", function(){
+    setComplete("t3a", false);
+    t3aEngine.reset();
+  });
+
+  /* ---------------------------------------------------------
+     ACTIVITY 3, PART B — OCEAN ZONES IN DETAIL
+  --------------------------------------------------------- */
+  var oceanBins = [
+    {id:"intertidal", label:"Intertidal Zone", icon:"🌊"},
+    {id:"coastal", label:"Coastal Ocean", icon:"🐚"},
+    {id:"photic", label:"Open Ocean — Photic Zone", icon:"☀️"},
+    {id:"aphotic", label:"Open Ocean — Aphotic Zone", icon:"🌑"},
+    {id:"benthic", label:"Benthic Zone", icon:"🪨"}
+  ];
+
+  var oceanCards = [
+    {id:"o1", bin:"intertidal", text:"At high tide, organisms are submerged and battered by waves and currents; at low tide, they're exposed to air and sunlight."},
+    {id:"o2", bin:"intertidal", text:"Organisms here face extreme, repeated changes in temperature and moisture within a single day."},
+    {id:"o3", bin:"coastal", text:"Extends from the low-tide mark to the outer edge of the continental shelf."},
+    {id:"o4", bin:"coastal", text:"Brightly lit water enriched by nutrients washed in from land runoff — one of the most productive marine environments."},
+    {id:"o5", bin:"coastal", text:"Kelp forests and coral reefs are two of its most important, productive communities."},
+    {id:"o6", bin:"photic", text:"Begins at the edge of the continental shelf; sunlight reaches down to about 200 meters here."},
+    {id:"o7", bin:"photic", text:"Nutrient levels are low, but because this zone covers such an enormous area, most of Earth's photosynthesis happens here."},
+    {id:"o8", bin:"photic", text:"Phytoplankton drift and photosynthesize here, feeding the zooplankton that graze on them."},
+    {id:"o9", bin:"aphotic", text:"Permanently dark below about 200 meters — no sunlight ever reaches this zone."},
+    {id:"o10", bin:"aphotic", text:"Food webs here depend on organic material sinking from above, or on chemosynthetic producers near deep-sea vents."},
+    {id:"o11", bin:"aphotic", text:"The silver hatchetfish spends its life in total darkness here, in the deep waters of the Gulf of Mexico."},
+    {id:"o12", bin:"benthic", text:"Organisms live on or in the rocks and sediment at the very bottom — whether that bottom is a few meters down or thousands."}
+  ];
+
+  var t3bFill = document.getElementById("t3b-fill");
+  var t3bCount = document.getElementById("t3b-count");
+  var t3bBank = document.getElementById("t3b-bank");
+  var t3bBins = document.getElementById("t3b-bins");
+  var t3bCheckBtn = document.getElementById("t3b-check");
+  var t3bEngine = buildSort({
+    bankEl:t3bBank, binsEl:t3bBins, bins:oceanBins, cards:shuffle(oceanCards),
+    onProgress:function(done,total){
+      t3bFill.style.width = (done/total*100)+"%";
+      t3bCount.textContent = done+" / "+total+" placed";
+      t3bCheckBtn.disabled = (done !== total);
+    },
+    onChecked:function(correct,total){
+      t3bCheckBtn.disabled = true;
+      t3bCount.textContent = (correct===total)
+        ? "All "+total+" correct — the ocean is officially mapped! 🌊"
+        : correct+" / "+total+" correct — hit Reset to try again.";
+      if(correct===total) setComplete("t3b", true);
+    }
+  });
+
+  t3bCheckBtn.addEventListener("click", function(){ t3bEngine.check(); });
+  document.getElementById("t3b-reset").addEventListener("click", function(){
+    setComplete("t3b", false);
+    t3bEngine.reset();
+  });
+
+  // Ocean cross-section diagram (context only, not interactive)
+  document.getElementById("t3-diagram").innerHTML =
+    '<img src="cards/ocean-zones-diagram.png" alt="Ocean cross-section diagram showing the Intertidal Zone, Coastal Ocean, and Open Ocean (Photic and Aphotic Zones), with the Benthic Zone along the continental shelf and sea floor, and depth markers at 200 m, 1,000 m, 4,000 m, and 10,000 m."/>';
+
+
+})();
+</script>
+
+</body></html>
